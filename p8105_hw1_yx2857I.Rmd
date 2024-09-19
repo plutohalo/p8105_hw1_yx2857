@@ -4,27 +4,83 @@ output: github_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(tidyverse)
+library(ggplot2)
 ```
 
-## GitHub Documents
 
-This is an R Markdown format used for publishing markdown documents to GitHub. When you click the **Knit** button all R code chunks are run and a markdown file (.md) suitable for publishing to GitHub is generated.
-
-## Including Code
-
-You can include R code in the document as follows:
-
-```{r cars}
-summary(cars)
+```{r data}
+# import dataset
+data("penguins", package = "palmerpenguins")
 ```
 
-## Including Plots
+**Problem 1**   
 
-You can also embed plots, for example:
+The dataset, _penguins_, stores information of penguins, including species, island, body measurements, sex, and year. The penguin dataset has `r ncol(penguins)` columns and `r nrow(penguins)` rows.  
+The mean flipper length is `r sprintf("%.2f", mean(penguins$flipper_length_mm, na.rm = T))` mm.  
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+
+
+```{r plot}
+# Make a scatterplot of flipper_length_mm (y) vs bill_length_mm (x); color points using the species variable
+p <- ggplot(penguins, aes(x = bill_length_mm, y = flipper_length_mm, color = species)) +
+  geom_point() +
+  labs(title = "Flipper Length vs. Bill Length",
+       x = "Bill Length (mm)",
+       y = "Flipper Length (mm)",
+       color = "Species")
+ggsave("flipper_bill_length.png", plot = p, width = 6, height = 4)
+print(p)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+**Problem 2**  
+Dataset "store" is created as follows:  
+```{r problem2_data}
+# Create a data frame comprised of:
+# 
+# a random sample of size 10 from a standard Normal distribution
+# a logical vector indicating whether elements of the sample are greater than 0
+# a character vector of length 10
+# a factor vector of length 10, with 3 different factor “levels”
+
+set.seed(8105)
+
+store <- tibble(
+  balance = rnorm(10),
+  good = balance > 0,
+  staff = letters[1:10],
+  manager = factor(c(rep(letters[1:3], 3), letters[1]))
+)
+
+store
+
+```
+
+Try to take the mean of each variable in your dataframe. What works and what doesn’t?  
+```{r problem2_mean}
+# Try to take the mean of each variable in your dataframe. What works and what doesn’t?
+# 
+# Hint: to take the mean of a variable in a dataframe, you need to pull the variable out of the dataframe. Try loading the tidyverse and using the pull function.
+
+store %>% 
+  summarise(
+    balance = mean(balance, na.rm = T),
+    good = mean(good, na.rm = T),
+    staff = mean(staff, na.rm = T),
+    manager = mean(manager, na.rm = T)
+  )
+
+```
+
+Taking the mean works for the variable `balance` and `good`, but not for the variable `staff` or `manager`.  
+
+```{r problem2_convert, include=TRUE, echo = TRUE, results=FALSE}
+# Write a code chunk that applies the as.numeric function to the logical, character, and factor variables (please show this chunk but not the output). What happens, and why? Does this help explain what happens when you try to take the mean?
+store %>% pull(good) %>% as.numeric
+store %>% pull(staff) %>% as.numeric
+store %>% pull(manager) %>% as.numeric
+```
+
+When applying the `as.numeric` function to the logical, character, and factor variables, the logical variable `good` is converted to 0 and 1, the character variable `staff` is converted to `NA`, and the factor variable `manager` is converted to the integer representation of the factor levels. This helps explain what happens when trying to take the mean of these variables. The `mean` function only works for numeric variables, so it will not work for logical, character, or factor variables.
+
