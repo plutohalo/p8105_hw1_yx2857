@@ -17,9 +17,9 @@ data("penguins", package = "palmerpenguins")
 
 **Problem 1**   
 
-The dataset, _penguins_, stores information of penguins, including species, island, body measurements, sex, and year. The penguin dataset has `r ncol(penguins)` columns and `r nrow(penguins)` rows.  
+The dataset, _penguins_, stores information of penguins, including species, island, body measurements, sex, and year. The _penguin_ dataset has `r ncol(penguins)` columns and `r nrow(penguins)` rows.  
 The mean flipper length is `r sprintf("%.2f", mean(penguins$flipper_length_mm, na.rm = T))` mm.  
-
+Another dataset, _penguins_raw_, stores the raw data that _penguins_ originates from, including more detailed information of the penguins. The _penguins_raw_ dataset has `r ncol(penguins_raw)` columns and `r nrow(penguins_raw)` rows.  
 
 
 ```{r plot}
